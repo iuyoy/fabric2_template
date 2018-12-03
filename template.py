@@ -36,12 +36,12 @@ def thread_run(group, function, args, kwargs):
 def parallelly_run(hosts, operations):
     group = connect(hosts)
     for operation in operations:
-        function = command[1] if len(command) > 1 else 'run'
-        kwargs = command[2] if len(command) > 2 else {}
+        function = operation[1] if len(operation) > 1 else 'run'
+        kwargs = operation[2] if len(operation) > 2 else {}
         # files are uploaded to ~/ by default
-        for cmd in command[0].splitlines():
-            print("\nexcute: {} {}".format(action, cmd))
-            thread_run(group, function=function, args=(file_path,), kwargs={})
+        for cmd in operation[0].splitlines():
+            print("\nexcute: {} {}".format(function, cmd))
+            thread_run(group, function=function, args=(cmd,), kwargs=kwargs)
 
 
 if __name__ == '__main__':

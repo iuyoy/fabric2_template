@@ -8,43 +8,68 @@ This is a template for running commands parallelly in multi-servers with python 
 
 ## How to use
 
-Support functions: connection.run, connection.sudo, connection.put
+- test_connection(hosts)
+  
+    run `hostname` for each host, print exception for failed connection.
 
-```python
-operations = [
-    # [files or commands, is_upload or is_sudo, other parameters]
-    # Detailed parameters can be found in fabirc.connection.
-    ['./test.md', 'upload', {}],
-    ['whoami'],
-    ['whoami', 'sudo'],
-    ['whoami', 'sudo', {'user': 'another_user'}],
-    ["""cat ~/test.md
-whoami"""],
-]
-```
+    ```python
+    hosts = ['user@host1:port', 'user@host2:port']
+    ```
 
-```bash
-$ python template.py
+- parallelly_run(hosts, operations)
 
-excute: put ./test.md
+    run commands parallelly
 
-excute: run whoami
-user
-user
+    **supported functions**: connection.run, connection.sudo, connection.put
+    ```python
+    hosts = ['user@host1:port', 'user@host2:port']
 
-excute: sudo whoami
-root
-root
+    operations = [
+        # [files or commands, function: put, run (default) or sudo, other parameters]
+        # or  
+        # [ file list or command list, function: put, run (default) or sudo, other parameters (can be dict, if same for all hosts) or other parameter list]
+        # Detailed parameters can be found in fabirc.connection.
+        ['./test.md', 'put', {}],
+        ['whoami'],
+        ['whoami', 'sudo'],
+        ['whoami', 'sudo', {'user': 'another_user'}],
+        ["""cat ~/test.md
+    whoami"""],
+        [['./test.md', './test.md'], 'put',
+            [{'remote': '1.txt'}, {'remote': '2.txt'}]],
 
-excute: sudo whoami
-another_user
-another_user
+        [['cat 1.txt', 'cat 2.txt']],
+        ]
+    ```
 
-excute: run cat ~/test.md
-hello hello.
-hello hello.
+    ```bash
+    $ python template.py
 
-excute: run whoami
-user
-user
-```
+    excute: put ./test1.md
+
+    excute: run whoami
+    user
+    user
+
+    excute: sudo whoami
+    root
+    root
+
+    excute: sudo whoami
+    another_user
+    another_user
+
+    excute: run cat ~/test1.md
+    hello test 1.
+    hello test 1.
+
+    excute: run whoami
+    user
+    user
+
+    excute diff commands, example: put ./test1.md
+
+    excute diff commands, example: run cat 1.txt
+    hello test 2.
+    hello test 1.
+    ```
